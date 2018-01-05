@@ -1,0 +1,335 @@
+syntax = "proto3";
+
+package typedef;
+
+
+enum AdType {
+  eAdTypeUnknown = 0;
+  eBanner  = 1;
+  ePopup   = 2;
+  eNative  = 3;
+}
+
+enum ImageMime {
+  eImgUnknown = 0;
+  eJPG     = 1;
+  ePNG     = 2;
+  eGIF     = 3;
+}
+
+enum OSType {
+  eOSUnknown = 0;
+  eIOS     = 1;
+  eANDROID = 2;
+  eWPH     = 3;
+  eWCE     = 4;
+  eRIM     = 5;
+  eLSPH    = 6;
+  eMAC     = 7;
+  eLINUX   = 8;
+  eJVM     = 9;
+
+  eRIMTABLET = 10;
+  eTIZEN     = 11;
+  eWIN       = 12;
+  eOSX       = 13;
+  eBBERRY    = 14;
+  eSYMBIAN   = 15;
+}
+
+enum PayoutMode {
+  ePayoutUnknown = 0;
+  eCpaFixed      = 1;
+  eCpaDynamic    = 2;
+}
+
+
+enum InventoryType {
+  eInventoryUnkown = 0;
+  eInventoryWhite  = 1;
+  eInventoryBlack  = 2;
+}
+
+enum AudienceType {
+  eAudienceNone   = 0;
+  eAudienceWhite  = 1;
+  eAudienceBlack  = 2;
+}
+
+
+enum DevType  {
+  eDevUnkown    = 0;
+  eDevTablet    = 1;
+  eDevMobile    = 2;
+  eDevDesktop   = 3;
+}
+
+enum ConnType {
+  eConnUnkown     = 0;
+  eConnAll        = 1;
+  eConnMobile     = 2;
+  eConnWifi       = 3;
+}
+
+enum SourceType {
+  eSourceUnknonwn = 0;
+  eSourceInApp    = 1;
+  eSourceWeb      = 2;
+  eSourceAll      = 3;
+}
+
+message Campaign {
+  uint64     id     = 1;
+  AdType     adtype = 2;
+
+  CampBasic  basic  = 3;
+  Budget    budget  = 4;
+  Target   target   = 5;
+  
+  repeated  Creative  creatives = 6;
+}
+
+message CampBasic {
+  string     name = 2;
+  
+  //AdType    adType  = 3;
+ 
+  bool      isActive = 4;
+
+  //tracking impression url
+  string    trkimpurl   = 5;
+
+  //tracking campaign url attach mdsp campaign 
+  string    trkcampurl  = 6;
+
+  //advertiser domain 
+  string    advtdomain  = 7;
+
+  //payout 10e6 in uint
+  uint64    payout = 8;
+  //payout type
+  PayoutMode  payoutMode = 9;
+
+  //conversion action in url
+  string    convurl   = 10;
+  
+  //max bid price 10e6 in unit
+  uint64  maxBidPrice = 11;
+
+  //user id of campaign 
+  uint64  userid   = 12;
+
+  //tracking campaign click url
+  string trkclickurl = 13;
+}
+
+message Creative {
+  oneof crv {
+    BannerCreative  bannerCrv = 1;
+    PopupCreative   popupCrv  = 2;
+    NativeCreative  nativeCrv = 3;
+  }
+}
+
+
+ enum SpendModel {
+    eSpendUnknown   = 0;
+    eAsap           = 1;
+    eSmooth         = 2;
+  }
+
+ enum FreqCappingInterval {
+    eFreqCappingUnknown      = 0;
+    e3Hour        = 1;
+    e6Hour        = 2;
+    e12Hour       = 3;
+    e24Hour       = 4;
+  }
+
+
+message Budget {
+  bool  unlimitedEnable   = 1;
+
+  //budget in unit 10e6
+  uint64 totalBudget       = 2;
+  uint64 dailyBudget       = 3;
+  uint64 placementBudget   = 4;
+
+  //utc datetime
+  uint64  startStamp = 5;
+  uint64  endStamp   = 6;
+
+  //frequency control
+  bool    freqCappingEnable = 7;
+  uint64  freqCapping       = 8;
+  FreqCappingInterval  freqCappingInterval = 9;
+
+  SpendModel  spendModel = 10;
+
+  //int64 array, 7 element total, each one representes 24 hours in 24 bit from low to high address 
+  repeated uint64 dayParting = 11;
+
+  string   timezone    = 12;
+}
+
+message Target {
+  repeated  uint64 adxs       = 1;
+  // 2 level category  
+  repeated  string categories = 2;
+  
+  //geo
+  repeated string country = 3;
+  repeated string region  = 4;
+  repeated string city    = 5;
+
+  //device type
+  repeated DevType   devtype          = 6;
+
+  //connection type
+  ConnType  conntype         = 7;
+
+  
+  repeated string carrier    = 8; 
+  //repeated string os   = ;
+  repeated string osv        = 9;
+
+  //
+  repeated  string ips       = 10;
+
+  //retargetting audiences
+  AudienceType  autype          = 11;
+  repeated string  retargetingAuListId  = 12;
+
+  //retargetting record
+  bool    isRetargettingEnable    = 13;
+  string  viewerListName          = 14;
+  string  visitorListName         = 15;
+  string  converterListName       = 16;
+
+  //inventory control type and whitelist or blacklist name inlcude
+  //bundle id, site url
+  InventoryType invenType = 17;
+  repeated string  invenName   = 18;
+
+  //check idfa/gaid or not
+  bool  isIdfaGaidValid   = 19;
+
+  //source type 
+  SourceType srctype      = 20; 
+}
+
+
+message BannerCreative {
+  uint64  id         = 1; 
+  uint64  camId      = 2;
+  bool    isActive   = 3;
+  
+  ImageMime  mime    = 4;
+  string     imgurl  = 5;
+ 
+  uint32  width      = 8;
+  uint32  height     = 9;
+
+  CreativeSnippet   snippet = 10;
+
+  bool    IsApproved = 11;
+}
+
+message PopupCreative {
+  uint64    id        = 1;
+  uint64    camId     = 2;
+  bool      isActive  = 3;
+
+  string    html      = 4;
+  
+  CreativeSnippet snippet = 11;
+
+  bool    IsApproved = 12;
+}
+
+message NativeCreative {
+  uint64    id       = 1;
+  uint64    camId    = 2;
+  bool      isActive = 3;
+
+  Native    native   = 4;
+
+  CreativeSnippet snippet = 11;  
+  bool    IsApproved = 12;
+}
+
+message Native {
+
+  Asset   asset = 1;
+  Link    link  = 2;
+
+  message Asset {
+    repeated  Title   title   = 1;
+    repeated  Data    data    = 2; 
+    repeated  Image   image   = 3;
+    repeated  Video   video   = 4;
+  }
+
+  message Title {
+    uint64   len  = 1;
+    string  text  = 2;
+  }
+
+  enum NativeImageType {
+    eNativeImageUnkown = 0;
+    eNativeImageIcon   = 1;
+    eNativeImageLogo   = 2;
+    eNativeImageMain   = 3;
+  }
+
+  message Image {
+    int32 w = 1;
+    int32 h = 2;
+
+    ImageMime mime = 3;
+    string  url  = 4;
+
+    NativeImageType type = 5;
+  }
+
+  message Data {
+   int64   type  = 1;
+   uint64  len   = 2;
+    
+   string  value  = 3;
+  }
+
+  message Video {
+    int32 w = 1;
+    int32 h = 2;
+
+    int32 duration = 3;
+
+    string  mime = 4;
+    string  url  = 5;
+    string  coverUrl = 6;
+  }
+
+  message Link {
+    //landing URL of the clickable link
+    string url        = 1;
+    
+    //fallback URL for deeplink
+    string fallback   = 2;
+
+    //list of third-party tracker urls to be fire on click of the URL
+    repeated string clicktrackers  = 3;
+  }
+}
+
+message CreativeSnippet {
+  string             adm     = 1;
+  repeated string    adomain = 2;
+
+  string    nurl = 3;
+  string    iurl = 4;
+
+  uint64  flowId  = 6;
+  string  desturl = 7;
+  string  campurl = 8;
+}

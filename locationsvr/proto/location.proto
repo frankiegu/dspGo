@@ -1,0 +1,38 @@
+syntax = "proto3";
+package proto;
+
+message LocRequest {
+  string  ip = 1;
+}
+
+message IpLocation {
+  string  countryName = 1;
+  string  countryAbbr = 2;
+
+  string  region = 3;
+  string  city   = 4;
+
+  string  isp = 5;
+  float   lat = 6;
+  float   lon = 7;
+
+  string  domain  = 8;
+  string  zipCode = 9;
+ 
+  string  timeZone = 10;
+  string  netSpeed = 11;
+  string  iddCode  = 12;
+  string  areaCode = 13;
+
+  string  weatherName = 14;
+  string  weatherCode = 15;
+
+  string  mcc = 16;
+  string  mnc = 17;
+
+  string  mobileBrand = 18;
+}
+
+service LocationSvr {
+  rpc Ip2Location(LocRequest) returns (IpLocation) {}
+}
