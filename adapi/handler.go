@@ -55,7 +55,7 @@ func UpdateTargetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	UpdateTarget(campId, &tar)
+	UpdateTarget(uint64(campId), &tar)
 	log.Println("ids: ", tar)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
@@ -83,7 +83,7 @@ func UpdateBasicHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	UpdateBasic(campId, &basic)
+	UpdateBasic(uint64(campId), &basic)
 	log.Println("ids: ", basic)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
@@ -110,7 +110,7 @@ func UpdateBudgetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	UpdateBudget(campId, &budget)
+	UpdateBudget(uint64(campId), &budget)
 	log.Println("ids: ", budget)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
@@ -143,8 +143,8 @@ func UpdatePopupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	UpdatePopup(campId, popupSet.popupes)
-	log.Println("ids: ", popup)
+	UpdatePopup(uint64(campId), popupSet.popupes)
+	log.Println("ids: ", popupSet.popupes)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
 }
@@ -210,7 +210,7 @@ func DeleteCampaignHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("StartCampaignHandler: ", r.RequestURI, campId)
 
-	DeleteCampaign(campId)
+	DeleteCampaign(uint64(campId))
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
 }
@@ -222,7 +222,7 @@ func StartCampaignHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("StartCampaignHandler: ", r.RequestURI, campId)
 
-	StartCampaign(campId)
+	StartCampaign(uint64(campId))
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
 }
@@ -233,7 +233,7 @@ func PauseCampaignHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("StartCampaignHandler: ", r.RequestURI, campId)
 
-	PauseCampaign(campId)
+	PauseCampaign(uint64(campId))
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
 }
@@ -262,7 +262,7 @@ func ActiveCreativeHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("ids: ", ids)
 
-	ActiveCreative(campId, ids.Ids)
+	ActiveCreative(uint64(campId), ids.Ids)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
 }
@@ -291,7 +291,7 @@ func InactiveCreativeHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("ids: ", ids)
 
-	InactiveCreative(campId, ids.Ids)
+	InactiveCreative(uint64(campId), ids.Ids)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
 }
@@ -320,7 +320,7 @@ func ApproveCreativeHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("ids: ", ids)
 
-	ApproveCreative(campId, ids.Ids)
+	ApproveCreative(uint64(campId), ids.Ids)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
 }
@@ -349,7 +349,7 @@ func UpdateInventoryHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("inventory: ", inven)
 
-	UpdateInventory(campId, &inven)
+	UpdateInventory(uint64(campId), &inven)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
 }
@@ -377,7 +377,7 @@ func UpdateAudienceHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("audience: ", au)
 
-	UpdateAudience(campId, &au)
+	UpdateAudience(uint64(campId), &au)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
 }
@@ -418,11 +418,11 @@ func FuncV1Handler(w http.ResponseWriter, r *http.Request) {
 	log.Println("FuncHandler: ", r.RequestURI, funcName, campId)
 	switch funcName {
 		case "deletecamp":
-			DeleteCampaign(campId)
+			DeleteCampaign(uint64(campId))
 		case "startcamp":
-			StartCampaign(campId)
+			StartCampaign(uint64(campId))
 		case "pausecamp":
-			PauseCampaign(campId)
+			PauseCampaign(uint64(campId))
 	}
 
 	body, err := ioutil.ReadAll(r.Body)

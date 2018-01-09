@@ -36,7 +36,7 @@ type CampDevFreqController interface {
 /*
 * Campaign buddget controller
 */
-type CampBudgetController {
+type CampBudgetController interface{
 	IsCampBudgetValid(camId uint64)		(bool, error)
 
 	ValidCampBudget(camIds	  ...uint64)	error
@@ -47,7 +47,7 @@ type CampBudgetController {
 * campaign placement(app) budget controller
 * placement: app bundle id 
 */
-type CampAppBudgetController {
+type CampAppBudgetController interface{
 	IsCampAppValid(camId uint64, bundleId string)	(bool, error)
 
 	ValidCampAppBudget(camId uint64,   bundleId string)	 error
@@ -58,7 +58,7 @@ type CampAppBudgetController {
 * campaign placement(site) budget controller
 * placement: site domain 
 */
-type CampSiteBudgetController {
+type CampSiteBudgetController interface{
 	IsCampSiteValid(camId uint64, domain string)	(bool, error)
 
 	ValidCampSiteBudget(camId uint64,   domain string)	error
@@ -68,7 +68,7 @@ type CampSiteBudgetController {
 /*
 * Campaign peroid controller
 */
-type CampPeroidControler {
+type CampPeroidControler interface{
 	IsCampPeroidValid(camId uint64)		(bool, error)
 
 	ValidCampInPeroid(camIds   ...uint64)		error

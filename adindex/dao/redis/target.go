@@ -1,12 +1,13 @@
 package dao
 
 import (
-	"log"
+	_"log"
 	"errors"
 
 	"mdsp/common/typedef"
 	"github.com/go-redis/redis"
 	pb "github.com/golang/protobuf/proto"
+	"fmt"
 )
 
 var (
@@ -66,10 +67,7 @@ type SubTarget struct {
 }
 
 func (t *SubTarget) Key() string {
-	return fmt.Sprintf("%s%s=%d&%s=%d&%s=%s&%s=%s&%s=%d&%s=%d&%s=%d",REDISKEY_TARGET_PREFIX,
-																													 ADTYPE, t.adtype, ADX, t.adx, OSV, t.osv,CITY, t.geo,
-																													 DEVTYPE, t.devtype, CONNTYPE, t.conntype,
-																												   SOURCETYPE, t.sourcetype)
+	return fmt.Sprintf("%s%s=%d&%s=%d&%s=%s&%s=%s&%s=%d&%s=%d&%s=%d",REDISKEY_TARGET_PREFIX,SOURCETYPE, t.sourcetype)
 }
 
 func CreateTarget(cli *redis.Client, camp *typedef.Campaign) error {
@@ -85,21 +83,20 @@ func CreateTarget(cli *redis.Client, camp *typedef.Campaign) error {
 		return ErrRedisCliNullPtr
 	}
 
-	subtargets := make([]SubTarget)
+	subtargets := make([]SubTarget,0)
 	for _, adx := range camp.Target.Adxs {
 		s := SubTarget {
 			adx: adx,
 		}
-
-		subtargets = append(s)
+		subtargets = append(subtargets,s)
 	}
 
-	precnt = len(subtargets)
+	precnt := len(subtargets)
 	var temp []SubTarget
 	copy(temp, subtargets)
 
 	for i := len(camp.Target.Osv); i > 1; i-- {
-		subtargets = append(subtargets, temp)
+		subtargets = append(subtargets, temp[0:]...)
 	}
 
 	for i, s := range subtargets {
@@ -109,11 +106,11 @@ func CreateTarget(cli *redis.Client, camp *typedef.Campaign) error {
 	precnt = len(subtargets)
 	//temp = subtarget
 	for i := len(camp.Target.Devtype); i > 1; i-- {
-		subtargets = append(subtargets, subtargets[:precnt])
+		subtargets = append(subtargets, subtargets[:precnt]...)
 	}
 
 	for i, s := range subtargets {
-		s.devtype = int32(camp.Target.Devtype[i / precnt]
+		s.devtype = int32(camp.Target.Devtype[i / precnt])
 	}
 
 	precnt = len(subtargets)
@@ -123,11 +120,11 @@ func CreateTarget(cli *redis.Client, camp *typedef.Campaign) error {
 		connTypes = append(connTypes, int32(typedef.ConnType_eConnWifi))
 		connTypes = append(connTypes, int32(typedef.ConnType_eConnMobile))
 	} else {
-		connTypes = append(connTypes, int32(camp.Target.Conntype)
+		connTypes = append(connTypes, int32(camp.Target.Conntype))
 	}
 
 	for i := len(connTypes); i > 1; i-- {
-		subtargets = append(subtargets, subtargets[:precnt])
+		subtargets = append(subtargets, subtargets[:precnt]...)
 	}
 
 	for i, s := range subtargets {
@@ -145,7 +142,7 @@ func CreateTarget(cli *redis.Client, camp *typedef.Campaign) error {
 	}
 
 	for i := len(srcTypes); i > 1; i-- {
-		subtargets = append(subtargets, subtargets[:precnt])
+		subtargets = append(subtargets, subtargets[:precnt]...)
 	}
 
 	for i, s := range subtargets {
@@ -154,16 +151,16 @@ func CreateTarget(cli *redis.Client, camp *typedef.Campaign) error {
 
 	precnt = len(subtargets)
 
-	geo := make([]string)
-	if len(camp.Target.City) > 0 || len(camp.Target.Region > 0 {
-		geo = append(geo, camp.Target.City)
-		geo = append(geo, camp.Target.Region)
+	geo := make([]string,0)
+	if (len(camp.Target.City) > 0 || len(camp.Target.Region) > 0) {
+		geo = append(geo, camp.Target.City[0:]...)
+		geo = append(geo, camp.Target.Region[0:]...)
 	} else if len(camp.Target.Country) > 0 {
-		geo = append(geo, camp.Target.Country)
+		geo = append(geo, camp.Target.Country[0:]...)
 	}
 
 	for i := len(geo); i > 1; i-- {
-		subtargets = append(subtargets, subtargets[:precnt])
+		subtargets = append(subtargets, subtargets[:precnt]...)
 	}
 
 	for i, s := range subtargets {
@@ -171,8 +168,8 @@ func CreateTarget(cli *redis.Client, camp *typedef.Campaign) error {
 	}
 
 	campTarKey := fmt.Sprintf(REDISKEY_CAMPAIGN_TARGET, camp.Id)
-	for i, s := range subtargets {
-		s.adtype = int32(camp.Basic.AdType)
+	for _, s := range subtargets {
+		s.adtype = int32(camp.Adtype)
 
 		cli.SAdd(s.Key(), camp.Id)
 		cli.SAdd(campTarKey, s.Key())
@@ -220,7 +217,7 @@ func UpdateTarget(cli *redis.Client, campId uint64, target *typedef.Target) erro
 		newCamp.Target = target
 		cli.Set(key, newCamp.String(), 0)
 
-		return CreateTarget(cli, newCamp)
+		return CreateTarget(cli, &newCamp)
 	}
 }
 
@@ -238,7 +235,7 @@ func GetTargetCamp(cli *redis.Client,
 									adtype		typedef.AdType,
 									devtype		typedef.DevType,
 									conntype	typedef.ConnType,
-									srctype		typedef.SourceType_eSourceAll) ([]uint64, error) {
+									srctype		typedef.SourceType) ([]uint64, error) {
 	if cli == nil {
 		return nil, ErrRedisCliNullPtr
 	}
@@ -265,7 +262,7 @@ func GetTargetCamp(cli *redis.Client,
 	osvv := fmt.Sprintf("%s %s", os, osv)
 	osvs := []string{os, osvv}
 	for i := len(osvs); i > 1; i-- {
-		subtargets = append(subtargets, subtargets[:cnt])
+		subtargets = append(subtargets, subtargets[:cnt]...)
 	}
 
 	for i , _ := range subtargets {

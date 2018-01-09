@@ -219,7 +219,7 @@ const (
 	POST = "POST"
 )
 
-var rmq 
+//var rmq
 //need login or
 //delpoy in the same local network
 func main() {

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"errors"
 	"encoding/json"
-	"mdsp/utils/consts"
-	"mdsp/utils/typedef"
+	"mdsp/common/consts"
+	"mdsp/common/typedef"
 
 	rmq "mdsp/utils/rabbitmq"
 )
@@ -13,6 +13,29 @@ import (
 var (
 	Publisher *rmq.Publisher
 )
+
+type UpdateCreative struct {
+	Crves []PopupCrv
+}
+type UpdateBannerCreative struct{
+	Crves []BannerCrv
+}
+
+type UpdateNativeCreative struct{
+	Crves []NativeCrv
+}
+
+type UpdateRetargeting struct {
+	CampId uint64
+	AuIdList []string
+}
+
+
+
+type InvenMsg struct {
+	CampId uint64
+	InvenNames []string
+}
 
 
 var (
@@ -55,10 +78,10 @@ func DeleteCampaign(campId uint64) error {
 		Body: fmt.Sprintf("%d", campId),
 	}
 
-	if msgBody, err := json.Marshal(&msg); err != nil {
+	msgBody, err := json.Marshal(&msg);
+	if err != nil {
 		return err
 	}
-
 	return Publisher.Publish([]byte(msgBody), consts.RMQ_API_ROUTINE_NAME, consts.RMQ_API_CONTENTTYPE)
 }
 
@@ -72,11 +95,10 @@ func UpdateBasic(campId uint64, camp *Campaign) error {
 		Key	:	consts.API_KEY_UPDATE_BASIC,
 		Body: basic.String(),
 	}
-
-	if msgBody, err := json.Marshal(&msg); err != nil {
+	msgBody, err := json.Marshal(&msg);
+	if (err != nil) {
 		return err
 	}
-
 	return Publisher.Publish([]byte(msgBody), consts.RMQ_API_ROUTINE_NAME, consts.RMQ_API_CONTENTTYPE)
 }
 
@@ -91,7 +113,8 @@ func UpdateTarget(campId uint64, target *CampTarget) error {
 		Body: tar.String(),
 	}
 
-	if msgBody, err := json.Marshal(&msg); err != nil {
+	msgBody, err := json.Marshal(&msg);
+	if (err != nil) {
 		return err
 	}
 
@@ -109,7 +132,8 @@ func UpdateBudget(campId uint64, budget *CampBudget) error {
 		Body: b.String(),
 	}
 
-	if msgBody, err := json.Marshal(&msg); err != nil {
+	msgBody, err := json.Marshal(&msg);
+	if (err != nil) {
 		return err
 	}
 
@@ -122,11 +146,11 @@ func UpdatePopup(campId uint64, popups []PopupCrv) error {
 	}
 
 	upCrv := UpdateCreative {
-		Crves: make([]string, len(popups))
+		Crves: make([]PopupCrv, len(popups)),
 	}
 
 	for i, n := range popups {
-		upCrv.Crves[i] = n.String()
+		upCrv.Crves[i] = n
 	}
 
 	msg := typedef.AdApi2BeMsg {
@@ -134,7 +158,8 @@ func UpdatePopup(campId uint64, popups []PopupCrv) error {
 		Body: ,
 	}
 
-	if msgBody, err := json.Marshal(&msg); err != nil {
+	msgBody, err := json.Marshal(&msg);
+	if (err != nil) {
 		return err
 	}
 
@@ -146,12 +171,12 @@ func UpdateBanner(campId uint64, banner []BannerCrv) error {
 		return ErrNonePublisher
 	}
 
-	upCrv := UpdateCreative {
-		Crves: make([]string, len(banner))
+	upCrv := UpdateBannerCreative {
+		Crves: make([]BannerCrv, len(banner)),
 	}
 
 	for i, n := range banner {
-		upCrv.Crves[i] = n.String()
+		upCrv.Crves[i] = n
 	}
 
 	msg := typedef.AdApi2BeMsg {
@@ -159,7 +184,8 @@ func UpdateBanner(campId uint64, banner []BannerCrv) error {
 		Body: ,
 	}
 
-	if msgBody, err := json.Marshal(&msg); err != nil {
+	msgBody, err := json.Marshal(&msg);
+	if (err != nil) {
 		return err
 	}
 
@@ -171,21 +197,22 @@ func UpdateNative(campId uint64, native []NativeCrv ) error {
 		return ErrNonePublisher
 	}
 
-	upCrv := UpdateCreative {
-		Crves: make([]string, len(native))
+	upCrv := UpdateNativeCreative {
+		Crves: make([]NativeCrv,len(native)),
 	}
 
 	for i, n := range native {
-		upCrv.Crves[i] = n.String()
+		upCrv.Crves[i] = n.string()
 	}
 
 	upCrvBody, err := json.Marshal(&upCrv)
 	msg := typedef.AdApi2BeMsg {
 		Key	:	consts.API_KEY_UPDATE_NATIVE,
-		Body: upCrvBody,
+		Body: string(upCrvBody),
 	}
 
-	if msgBody, err := json.Marshal(&msg); err != nil {
+	msgBody, err := json.Marshal(&msg);
+	if (err != nil) {
 		return err
 	}
 
@@ -355,7 +382,7 @@ func UpdateInventory(campId uint64, inventory *Inventory) error {
 	if inventory.InvenType == InventoryBlack {
 		key = consts.API_KEY_UPDATE_BLACKINVENTORY
 	} else if inventory.InvenType == InventoryWhite {
-		key = consts.consts.API_KEY_UPDATE_WHITEINVENTORY
+		key = consts.API_KEY_UPDATE_WHITEINVENTORY
 	}
 
 	msg := typedef.AdApi2BeMsg {
@@ -377,7 +404,7 @@ func UpdateRetarget(campId uint64, retar *CampRetarget) error {
 	}
 
 	var key string
-	if retar.IsRetargettingEnable {
+	if retar.IsRetargettingEnable == 0{
 		key = consts.API_KEY_UPDATE_RETARGETTING_INCLUDE
 	} else {
 		key = consts.API_KEY_UPDATE_RETARGETTING_EXCLUDE

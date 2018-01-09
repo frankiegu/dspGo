@@ -4,8 +4,8 @@ import (
 	"log"
 	"encoding/json"
 
-	"dsp/common/consts"
-	"dsp/common/typedef"
+	"mdsp/common/consts"
+	"mdsp/common/typedef"
 )
 
 

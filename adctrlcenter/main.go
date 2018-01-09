@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	libredis "github.com/garyburd/redigo/redis"
+	//libredis "github.com/garyburd/redigo/redis"
 	"golang.org/x/net/context"
 
 	"mdsp/utils/redis"
