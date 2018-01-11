@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"mdsp/common/consts"
 	"mdsp/common/typedef"
-
+    proto "github.com/golang/protobuf/proto"
 	rmq "mdsp/utils/rabbitmq"
 )
 
@@ -106,11 +106,18 @@ func UpdateTarget(campId uint64, target *CampTarget) error {
 	if Publisher == nil {
 		return ErrNonePublisher
 	}
-
+	targetString,_ := json.Marshal(target)
 	var tar typedef.Target
+	json.Unmarshal([]byte(targetString),&typedef.Target)
+	//tar,_ = json.Unmarshal([]byte(targetString),&typedef.Target)
+
+	//json.Unmarshal([]byte(target),&typedef.Target)
+
+	//tar = target
+	//tar,_ = proto.Marshal(&target)
 	msg := typedef.AdApi2BeMsg {
-		Key	:	consts.API_KEY_UPDATE_TARGET,
-		Body: tar.String(),
+		Key	:  consts.API_KEY_UPDATE_TARGET,
+		Body:  tar.String(),
 	}
 
 	msgBody, err := json.Marshal(&msg);

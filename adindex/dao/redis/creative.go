@@ -33,14 +33,15 @@ func ActiveCreative(cli *redis.Client, campId uint64, crvIds ...uint64) error {
 	}
 
 	key := fmt.Sprintf(REDIS_KEY_ACTIVE_CREATIVE, campId)
-	activekey		:= fmt.Sprintf(REDIS_KEY_PENdING_ACTIVE_CREATIVE, campId)
+	activeKey		:= fmt.Sprintf(REDIS_KEY_PENdING_ACTIVE_CREATIVE, campId)
 	inactiveKey := fmt.Sprintf(REDIS_KEY_PENdING_INACTIVE_CREATIVE, campId)
 
 	active := make([]uint64, 0, len(crvIds))
 	pend	 := make([]uint64, 0, len(crvIds))
 
 	for _, id := range (crvIds) {
-		if cli.SIsMember(inactiveKey, id) {
+		res := cli.SIsMember(inactiveKey, id)
+		if (res.Val()) {
 			pend = append(pend, id)
 		} else {
 			active = append(active, id)
@@ -55,8 +56,11 @@ func ActiveCreative(cli *redis.Client, campId uint64, crvIds ...uint64) error {
 	}
 
 	if len(pend) > 0 {
-		res := cli.SRem(inactivekey, pend)
-		res := cli.SAdd(activeKey, pend)
+		res := cli.SRem(inactiveKey, pend)
+		if res.Err() != nil {
+			return res.Err()
+		}
+		res = cli.SAdd(activeKey, pend)
 
 		if res.Err() != nil {
 			return res.Err()
@@ -80,7 +84,8 @@ func InactiveCreative(cli *redis.Client, campId uint64,  crvIds ...uint64) error
 	pend	 := make([]uint64, 0, len(crvIds))
 
 	for _, id := range crvIds {
-		if cli.SIsMember(activekey, id) {
+		res := cli.SIsMember(activekey, id)
+		if (res.Val()) {
 			pend = append(pend, id)
 		} else {
 			active = append(active, id)
@@ -96,7 +101,10 @@ func InactiveCreative(cli *redis.Client, campId uint64,  crvIds ...uint64) error
 
 	if len(pend) > 0 {
 		res := cli.SRem(activekey, pend)
-		res := cli.SAdd(inactiveKey, pend)
+		if res.Err() != nil {
+			return res.Err()
+		}
+		res = cli.SAdd(inactiveKey, pend)
 		if res.Err() != nil {
 			return res.Err()
 		}
@@ -107,14 +115,14 @@ func InactiveCreative(cli *redis.Client, campId uint64,  crvIds ...uint64) error
 
 func GetActiveCreative(cli *redis.Client, campId uint64) (crvIds []uint64, err error) {
 	if cli == nil {
-		return ErrRedisCliNullPtr
+		return nil,ErrRedisCliNullPtr
 	}
 
 	key := fmt.Sprintf(REDIS_KEY_ACTIVE_CREATIVE, campId)
 	if res := cli.SMembers(key); res.Err() != nil {
 		return nil, res.Err()
 	} else {
-		ids []uint64
+		var ids []uint64
 		if err := res.ScanSlice(ids); err != nil {
 			return nil, err
 		}
@@ -155,7 +163,7 @@ func ApproveCreative(cli *redis.Client, campId uint64, crvIds ...uint64) error {
 		}
 
 		if len(inactive) > 0 {
-			res := cli.SRem(inactivekey, inactive)
+			res := cli.SRem(inactiveKey, inactive)
 			if res.Err() != nil {
 				return res.Err()
 			}
@@ -166,7 +174,7 @@ func ApproveCreative(cli *redis.Client, campId uint64, crvIds ...uint64) error {
 }
 
 func AppendCampCreative(cli *redis.Client, campId uint64, crv *typedef.Creative) error {
-	if cvr == nil {
+	if crv == nil {
 		return ErrCreativeNullPtr
 	}
 
@@ -234,7 +242,7 @@ func UpdateCampCreative(cli *redis.Client, campId uint64, crvs []*typedef.Creati
 	}
 
 	newcrv := make([]*typedef.Creative)
-	for _, cvr := range crvs {
+	for _, crv := range crvs {
 		for i, c := range newCamp.Creatives {
 			if crv.GetPopupCrv() && c.GetPopupCrv() && crv.GetPopupCrv().Id == c.GetPopupCrv().Id {
 				newCamp.Creatives[i].Crv = crv

@@ -8,7 +8,6 @@ import "github.com/streadway/amqp"
 type Publisher struct {
 	conn			*amqp.Connection
 	channel		*amqp.Channel
-
 	exchange			string
 	exchangeType	string
 }

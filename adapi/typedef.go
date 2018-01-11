@@ -64,6 +64,7 @@ type CampTarget struct {
 	ConverterListName	string		`json:"converterlsit"`
 
 	IsIdfaGaidValid	int	`json:"isIdfaGaid"`
+	Srctype int32
 }
 
 type CampBudget struct {

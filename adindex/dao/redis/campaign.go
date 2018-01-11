@@ -1,9 +1,9 @@
 package dao
 
 import (
-	"log"
+	_"log"
 	"errors"
-
+	"fmt"
 	"mdsp/common/typedef"
 	"github.com/go-redis/redis"
 	pb "github.com/golang/protobuf/proto"
@@ -61,12 +61,11 @@ func CreateCampaign(cli *redis.Client, camp *typedef.Campaign) error {
 		return err
 	}
 
-
-	if camp.Target && camp.Target.Autype == typedef.AudienceType_eAudienceWhite {
+	if (camp.Target != nil && camp.Target.Autype == typedef.AudienceType_eAudienceWhite) {
 		if err := CreateCampaignIncludeRetargettingList(cli, camp.Id, camp.Target.RetargetingAuListId...); err != nil {
 			return err
 		}
-	} else if camp.Target && camp.Target.Autype == typedef.AudienceType_eAudienceBlack {
+	} else if camp.Target != nil && camp.Target.Autype == typedef.AudienceType_eAudienceBlack {
 		if err := CreateCampaignExcludeRetargettingList(cli, camp.Id, camp.Target.RetargetingAuListId...); err != nil {
 			return err
 		}
@@ -85,17 +84,18 @@ func CreateCampaign(cli *redis.Client, camp *typedef.Campaign) error {
 
 func IsPlacementInBlacklist(cli *redis.Client, campId uint64, placement string) (bool, error) {
 	if cli == nil {
-		return ErrRedisCliNullPtr
+		return false,ErrRedisCliNullPtr
 	}
 
 	key := fmt.Sprintf(REDISKEY_CAMPAIGN_BLACKLIST_SET, campId)
+	//这块待定，到时再看
 	wlist, err := cli.SMembers(key).ScanSlice()
 	if err != nil {
 		return false, err
 	}
 
 	for _, list := range wlist {
-		if isIn, err := cli.SIsMemeber(list, placement).Result(); isIn {
+		if isIn, err := cli.SIsMember(list, placement).Result(); isIn {
 			return true, nil
 		}
 	}
@@ -141,7 +141,8 @@ func IsPlacementInWhitelist(cli *redis.Client, campId uint64, placement string) 
 		return false, err
 	}
 
-	for _, list := range wlist { if isIn, err := cli.SIsMemeber(list, placement).Result(); isIn {
+	for _, list := range wlist {
+		if isIn, err := cli.SIsMember(list, placement).Result(); isIn {
 			return true, nil
 		}
 	}
