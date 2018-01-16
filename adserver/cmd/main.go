@@ -15,8 +15,9 @@ import (
 	"github.com/buaazp/fasthttprouter"
 	"github.com/valyala/fasthttp"
 	"fmt"
+	"encoding/json"
 	_"github.com/golang/protobuf/proto"
-	_"github.com/mxmCherry/openrtb"
+	"github.com/mxmCherry/openrtb"
 )
 var confile string
 var adsvr *adserver.AdServer
@@ -48,9 +49,21 @@ func main() {
 func dspRequest(ctx *fasthttp.RequestCtx){
 	fmt.Fprintf(ctx, "Query string is %q\n", ctx.PostArgs())
 	//err = proto.Unmarshal(data, openrtb.BidRequest{})
-	BidRequest := ctx.FormValue("BidRequest")
+	BidValue := ctx.FormValue("BidRequest")
+
 	//解析BidRequest
-	fmt.Fprintf(ctx, "BidRequest %s\n", BidRequest)
+	BidRequest := &openrtb.BidRequest{}
+	err := json.Unmarshal([]byte(BidValue),BidRequest)
+	if (err !=  nil){
+		fmt.Fprintf(ctx, "BidRequest Unmarshal error %s\n", BidValue)
+		return
+	}
+	action,err := adx.GetAction(1)
+	if (err == nil){
+		fmt.Fprintf(ctx, "BidRequest %s\n", BidRequest)
+		action.HandleBidding(BidRequest)
+	}
+
 	//testString := "test"
 	//ctx.WriteString(testString)
 }

@@ -2,7 +2,7 @@ package adserver
 
 import (
 	_"mdsp/adserver/adx"
-	"github.com/mxmCherry/openrtb"
+	_"github.com/mxmCherry/openrtb"
 )
 
 
@@ -52,11 +52,7 @@ type AdCandidates struct{
 
 
 //would use different transport 
-type AdRetriever interface {
-	RetrieveBanner(cli, req *openrtb.BidRequest) (AdCandidates, error)
-	RetrievePopup(cli, req *openrtb.BidRequest) (AdCandidates,  error)
-	RetrieveNative(cli, req *openrtb.BidRequest) (AdCandidates, error)
-}
+
 
 
 

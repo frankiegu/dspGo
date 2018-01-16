@@ -17,3 +17,4 @@ type MgidRequest struct {
 func MgidActionNew(req *openrtb.BidRequest)(error)  {
 	return nil
 }
+
