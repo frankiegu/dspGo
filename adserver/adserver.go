@@ -1,15 +1,17 @@
 package adserver
 
 import (
-	"mdsp/adserver/adx"
+	_"mdsp/adserver/adx"
 	"github.com/mxmCherry/openrtb"
 )
 
-type AdServer struct {
+
+
+type AdxHandler interface {
 
 }
 
-type AdxHandler interface {
+type AdServer struct {
 
 }
 
@@ -67,14 +69,14 @@ type AdRetriever interface {
 *
 *
 */
-func(s *AdServer) HandleBidding(_ context.Context, req *openrtb.BidRequest, adx uint64) (adRes AdResults, err error) {
-	for _, r := range(req.Imp) {
-		if req.Imp.Banner != nil {
-			ads, err := s.Client.RetrieveBanner(req, adx, false)
-		} else if req.Imp.Native != nil {
-			ads, err := s.Client.RetrieveNative(req, adx, false)
+/*func(s *AdServer) HandleBidding(_ context.Context, req *openrtb.BidRequest, adx uint64) (adRes AdResults, err error) {
+	for k, r := range(req.Imp) {
+		if req.Imp[k].Banner != nil {
+			//ads, err := s.Client.RetrieveBanner(req, adx, false)
+		} else if req.Imp[k].Native != nil {
+			//ads, err := s.Client.RetrieveNative(req, adx, false)
 		}
 
 
 	}
-}
+}*/

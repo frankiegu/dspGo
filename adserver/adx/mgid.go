@@ -1,9 +1,8 @@
 package adx
 
 import (
-  "fmt"
-
-	"github.com/json-iterator/go"
+	_"fmt"
+	_"github.com/json-iterator/go"
 	"github.com/mxmCherry/openrtb"
 )
 
@@ -13,4 +12,8 @@ import (
 */
 type MgidRequest struct {
 
+}
+
+func MgidActionNew(req *openrtb.BidRequest)(error)  {
+	return nil
 }

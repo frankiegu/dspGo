@@ -3,8 +3,8 @@ package adindex
 import (
 	"log"
 
-	"common/consts"
-	rmq "dsp/utils/rabbitmq"
+	"mdsp/common/consts"
+	rmq "mdsp/utils/rabbitmq"
 	"github.com/go-redis/redis"
 )
 
@@ -12,7 +12,6 @@ import (
 type AdMsgHandler struct {
 	AdApiRmq				*rmq.Consumer
 	AdCCRmq					*rmq.Consumer
-
 	RedisCli				*redis.Client
 }
 

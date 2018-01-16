@@ -1,9 +1,8 @@
 package adx
 
 import (
-  "fmt"
-
-  "github.com/json-iterator/go"
+	_"fmt"
+	_"github.com/json-iterator/go"
 	"github.com/mxmCherry/openrtb"
 )
 
@@ -44,3 +43,8 @@ type SmattoBidReqUDI struct {
 type SmaatoResponse struct {
 	openrtb.BidResponse
 }
+
+func SmaatoActionNew(req *openrtb.BidRequest) (error) {
+	return nil
+}
+

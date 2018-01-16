@@ -9,7 +9,8 @@ import (
 	"runtime"
 
 	"mdsp/utils/conf"
-	redis "mdsp/utils/redis2"
+	redis "mdsp/utils/redis"
+	"mdsp/adindex/handler"
 )
 
 
